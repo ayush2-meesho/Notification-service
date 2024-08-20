@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 @ControllerAdvice
@@ -52,5 +53,16 @@ public class GlobalExceptionHandler {
                 .error(ErrorResponse.Error.builder().code("UNAUTHORIZED").message(ex.getMessage()).build())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(HttpStatusCodeException.class)
+    public ResponseEntity<ErrorResponse> handleHttpStatusCodeException(HttpStatusCodeException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .error(ErrorResponse.Error.builder()
+                        .code("HTTP_ERROR")
+                        .message(ex.getMessage())
+                        .build())
+                .build();
+        return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
 }
