@@ -1,5 +1,6 @@
 package com.messagingservice.notificationservice.handler.exceptionhandler;
 
+import com.messagingservice.notificationservice.exception.InvalidAuthHeaderException;
 import com.messagingservice.notificationservice.models.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +30,14 @@ public class GlobalExceptionHandler {
                 .error(ErrorResponse.Error.builder().code("INTERNAL_SERVER_ERROR").message(ex.getMessage()).build())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidAuthHeaderException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ErrorResponse> handleInvalidAuthHeaderException(InvalidAuthHeaderException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .error(ErrorResponse.Error.builder().code("UNAUTHORIZED").message(ex.getMessage()).build())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }
