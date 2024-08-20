@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.ResourceAccessException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,6 +22,18 @@ public class GlobalExceptionHandler {
                 .error(ErrorResponse.Error.builder().message(errorMessage).code("INVALID_REQUEST").build())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
+    public ResponseEntity<ErrorResponse> handleTimeoutException(ResourceAccessException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .error(ErrorResponse.Error.builder()
+                        .code("API_TIMEOUT")
+                        .message("The request timed out while waiting for a response from the API.")
+                        .build())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.GATEWAY_TIMEOUT);
     }
 
     @ExceptionHandler(Exception.class)
